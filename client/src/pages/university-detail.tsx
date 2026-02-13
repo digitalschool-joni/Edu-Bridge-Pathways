@@ -6,11 +6,23 @@ import { UNIVERSITIES } from "@/data/universities";
 import { Link, useRoute } from "wouter";
 import { MapPin, Users, Award, ExternalLink, GraduationCap, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useStore } from "@/lib/store";
+
+const CHECKLIST_ITEMS = [
+  "Review admission requirements",
+  "Prepare personal statement draft",
+  "Request recommendation letters",
+  "Collect transcripts and scores",
+  "Submit application before deadline",
+];
 
 export default function UniversityDetail() {
   const [, params] = useRoute("/universities/:id");
   const id = Number(params?.id);
   const uni = UNIVERSITIES.find((item) => item.id === id);
+  const { universityChecklist, toggleUniversityChecklistItem } = useStore();
+  const completedItems = universityChecklist[String(id)] ?? [];
+  const completionPercent = Math.round((completedItems.length / CHECKLIST_ITEMS.length) * 100);
 
   if (!uni) {
     return (
@@ -94,6 +106,30 @@ export default function UniversityDetail() {
                 </div>
               </div>
               <Button className="w-full bg-[#005b96] hover:bg-[#03396c]">Request Info Packet</Button>
+              <div className="rounded-lg border border-slate-200 p-3 bg-slate-50">
+                <p className="text-sm font-semibold text-[#011f4b] mb-2">
+                  Application Checklist ({completionPercent}% complete)
+                </p>
+                <div className="space-y-2">
+                  {CHECKLIST_ITEMS.map((item) => {
+                    const done = completedItems.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        className={`w-full text-left text-sm rounded-md border px-2 py-1 transition-colors ${
+                          done
+                            ? "bg-green-50 border-green-200 text-green-700"
+                            : "bg-white border-slate-200 text-slate-700"
+                        }`}
+                        onClick={() => toggleUniversityChecklistItem(id, item)}
+                      >
+                        {done ? "Done" : "Todo"}: {item}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

@@ -56,6 +56,18 @@ export const studyPlanSchema = z.object({
   }))
 });
 
+export const methodFeedbackSchema = z.object({
+  method: z.string(),
+  helpful: z.boolean(),
+  date: z.string(),
+});
+
+export const scheduleCompletionSchema = z.object({
+  blockKey: z.string(),
+  date: z.string(),
+  completed: z.boolean(),
+});
+
 // Unified State Object
 export const eduBridgeStateSchema = z.object({
   userProfile: userProfileSchema.optional(),
@@ -69,6 +81,10 @@ export const eduBridgeStateSchema = z.object({
   careerMatches: z.array(z.any()).default([]),
   universityMatches: z.array(z.any()).default([]),
   meetingRequests: z.array(z.any()).default([]),
+  methodFeedback: z.array(methodFeedbackSchema).default([]),
+  scheduleCompletions: z.array(scheduleCompletionSchema).default([]),
+  savedUniversities: z.array(z.number()).default([]),
+  universityChecklist: z.record(z.array(z.string())).default({}),
 });
 
 export type EduBridgeState = z.infer<typeof eduBridgeStateSchema>;

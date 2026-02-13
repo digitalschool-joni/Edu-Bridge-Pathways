@@ -77,7 +77,7 @@ export function Layout({ children }: LayoutProps) {
           <GraduationCap className="h-8 w-8 text-[#6497b1]" />
           EduBridge
         </h1>
-        <p className="text-xs text-blue-200 mt-1 uppercase tracking-wider">Pathways</p>
+        <p className="text-xs text-blue-200 mt-1 uppercase tracking-wider">UniTeen</p>
       </div>
 
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">

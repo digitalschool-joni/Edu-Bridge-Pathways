@@ -11,6 +11,10 @@ interface AppState extends EduBridgeState {
   addMoodEntry: (entry: EduBridgeState['moodEntries'][number]) => void;
   updateFinalSurvey: (survey: NonNullable<EduBridgeState['finalSurvey']>) => void;
   addMeetingRequest: (request: any) => void;
+  addMethodFeedback: (feedback: EduBridgeState['methodFeedback'][number]) => void;
+  setScheduleCompletion: (entry: EduBridgeState['scheduleCompletions'][number]) => void;
+  toggleSavedUniversity: (id: number) => void;
+  toggleUniversityChecklistItem: (universityId: number, item: string) => void;
   resetData: () => void;
 }
 
@@ -25,6 +29,10 @@ const initialState: EduBridgeState = {
   careerMatches: [],
   universityMatches: [],
   meetingRequests: [],
+  methodFeedback: [],
+  scheduleCompletions: [],
+  savedUniversities: [],
+  universityChecklist: {},
 };
 
 export const useStore = create<AppState>()(
@@ -52,6 +60,40 @@ export const useStore = create<AppState>()(
         
       addMeetingRequest: (request) =>
         set((state) => ({ meetingRequests: [...state.meetingRequests, request] })),
+
+      addMethodFeedback: (feedback) =>
+        set((state) => ({ methodFeedback: [feedback, ...state.methodFeedback] })),
+
+      setScheduleCompletion: (entry) =>
+        set((state) => {
+          const next = state.scheduleCompletions.filter(
+            (item) => !(item.blockKey === entry.blockKey && item.date === entry.date)
+          );
+          return { scheduleCompletions: [entry, ...next] };
+        }),
+
+      toggleSavedUniversity: (id) =>
+        set((state) => {
+          const exists = state.savedUniversities.includes(id);
+          return {
+            savedUniversities: exists
+              ? state.savedUniversities.filter((value) => value !== id)
+              : [...state.savedUniversities, id],
+          };
+        }),
+
+      toggleUniversityChecklistItem: (universityId, item) =>
+        set((state) => {
+          const key = String(universityId);
+          const current = state.universityChecklist[key] ?? [];
+          const hasItem = current.includes(item);
+          return {
+            universityChecklist: {
+              ...state.universityChecklist,
+              [key]: hasItem ? current.filter((entry) => entry !== item) : [...current, item],
+            },
+          };
+        }),
 
       resetData: () => set(initialState),
     }),

@@ -64,8 +64,11 @@ const QUESTIONS = [
 export default function Diagnostic() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [isGenerating, setIsGenerating] = useState(false);
   const [, setLocation] = useLocation();
-  const updateStudyPlan = useStore(state => state.updateStudyPlan);
+  const updateStudyPlan = useStore((state) => state.updateStudyPlan);
+  const initialSurvey = useStore((state) => state.initialSurvey);
+  const finalSurvey = useStore((state) => state.finalSurvey);
 
   const handleAnswer = (value: string) => {
     setAnswers(prev => ({ ...prev, [currentQ]: value }));
@@ -73,30 +76,72 @@ export default function Diagnostic() {
 
   const handleNext = () => {
     if (currentQ < QUESTIONS.length - 1) {
-      setCurrentQ(prev => prev + 1);
+      setCurrentQ((prev) => prev + 1);
     } else {
-      finishDiagnostic();
+      void finishDiagnostic();
     }
   };
 
-  const finishDiagnostic = () => {
-    // In a real app, this would use AI to generate the plan based on answers
-    // Here we generate a mock plan
-    updateStudyPlan({
-      weeklyGoals: [
-        "Complete 3 math practice sets",
-        "Review history timeline for Chapter 4",
-        "Spend 20 mins daily on active recall"
-      ],
-      recommendedMethod: "Pomodoro Technique (25m work / 5m break)",
-      practiceBlocks: [
-        { subject: "Mathematics", duration: "45 mins", task: "Calculus Limits - Practice Set A" },
-        { subject: "History", duration: "30 mins", task: "WWII Timeline Construction" },
-        { subject: "Physics", duration: "45 mins", task: "Force Diagrams Review" }
-      ]
-    });
+  const fallbackPlan = {
+    weeklyGoals: [
+      "Complete 3 math practice sets",
+      "Review history timeline for Chapter 4",
+      "Spend 20 mins daily on active recall",
+    ],
+    recommendedMethod: "Pomodoro Technique (25m work / 5m break)",
+    practiceBlocks: [
+      { subject: "Mathematics", duration: "45 mins", task: "Calculus Limits - Practice Set A" },
+      { subject: "History", duration: "30 mins", task: "WWII Timeline Construction" },
+      { subject: "Physics", duration: "45 mins", task: "Force Diagrams Review" },
+    ],
+  };
+
+  const finishDiagnostic = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch("/api/ai/study-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          answers: QUESTIONS.map((_, idx) => answers[idx]).filter(Boolean),
+          initialSurvey,
+          finalSurvey,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const plan = (await response.json()) as typeof fallbackPlan;
+      const hasValidPlan =
+        Array.isArray(plan.weeklyGoals) &&
+        typeof plan.recommendedMethod === "string" &&
+        Array.isArray(plan.practiceBlocks) &&
+        plan.practiceBlocks.every(
+          (block) =>
+            typeof block?.subject === "string" &&
+            typeof block?.duration === "string" &&
+            typeof block?.task === "string"
+        );
+
+      updateStudyPlan(hasValidPlan ? plan : fallbackPlan);
+    } catch (_error) {
+      updateStudyPlan(fallbackPlan);
+    } finally {
+      setIsGenerating(false);
+    }
+
     setLocation("/dashboard");
   };
+
+  const disableNext = !answers[currentQ] || isGenerating;
+
+  const currentButtonLabel = isGenerating
+    ? "Generating Plan..."
+    : currentQ === QUESTIONS.length - 1
+    ? "Generate My Plan"
+    : "Next Question";
 
   const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
 
@@ -143,11 +188,11 @@ export default function Diagnostic() {
           <div className="flex justify-end">
             <Button 
               onClick={handleNext} 
-              disabled={!answers[currentQ]}
+              disabled={disableNext}
               size="lg"
               className="bg-[#005b96] hover:bg-[#03396c] px-8"
             >
-              {currentQ === QUESTIONS.length - 1 ? "Generate My Plan" : "Next Question"}
+              {currentButtonLabel}
             </Button>
           </div>
         </div>
