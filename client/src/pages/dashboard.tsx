@@ -3,6 +3,7 @@ import { useStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Clock, BookOpen, CheckCircle, Volume2, Sparkles, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
