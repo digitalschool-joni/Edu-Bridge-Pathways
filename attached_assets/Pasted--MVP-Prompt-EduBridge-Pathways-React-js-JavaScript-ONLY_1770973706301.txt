@@ -1,0 +1,207 @@
+______________
+MVP Prompt — EduBridge Pathways (React.js, JavaScript ONLY)
+Build an MVP web app called EduBridge Pathways using React.js (JavaScript only — NOT TypeScript). The platform guides students from early high school through personalized studying and finishes with career + university matching supported by alumni mentoring.
+______________
+Tech Requirements
+•	React (JavaScript only)
+•	Vite
+•	React Router
+•	Plain CSS (preferred) or Tailwind
+•	No backend — use localStorage as database
+•	Modular reusable components
+______________
+Color Palette (must be used)
+Define CSS variables:
+:root {
+  --navy-900: #011f4b;
+  --navy-700: #03396c;
+  --blue-600: #005b96;
+  --blue-300: #6497b1;
+  --blue-100: #b3cde0;
+}
+Usage:
+•	Primary buttons: blue-600
+•	Navigation/header: navy-900
+•	Cards/secondary background: blue-300
+•	Page background: blue-100 or white
+•	Text on dark backgrounds: white
+______________
+Core Platform Flow
+1. Initial Journey Start (FIRST SURVEY)
+When student enters platform for first time:
+Page: /onboarding
+Multi-step Initial Survey collecting:
+Personal Information
+•	Name
+•	Age
+•	Location
+•	School
+•	Languages
+Learning Profile
+•	Favorite subjects
+•	Weak subjects
+•	Interests
+•	Preferred learning style:
+o	Visual
+o	Audio
+o	Reading
+o	Kinesthetic
+Study Method Preference
+•	Active recall
+•	Spaced repetition
+•	Practice problems
+•	Concept explanation
+•	Flashcards
+Goals
+•	Academic goals
+•	Personal goals
+SAVE results to localStorage.
+______________
+2. Diagnostic Learning Phase
+Page: /diagnostic
+Short diagnostic quiz.
+Generate:
+•	Personalized Study Plan
+•	Recommended learning method
+•	Weekly goals
+•	Practice blocks
+______________
+3. Personalized Study Dashboard
+Page: /dashboard
+Show:
+•	Study plan
+•	Progress cards
+•	Recommended study techniques
+•	Simplified explanation toggle
+•	Text-to-speech toggle (mock UI ok)
+______________
+4. Emotional Wellbeing
+Page: /mood
+Student completes:
+•	Mood rating (1–5)
+•	Optional note
+Display:
+•	Mood history
+•	Simple supportive suggestions.
+______________
+5. FINAL SURVEY (SECOND SURVEY — BEFORE CAREER)
+Student clicks:
+👉 “I'm finishing high school / Plan my future”
+Route:
+/final-survey
+This survey uses:
+Personality Assessment
+(Simple statements Agree/Neutral/Disagree)
+Example dimensions:
+•	Analytical
+•	Creative
+•	Social
+•	Leadership
+•	Independent
+•	Practical
+Values Ranking
+•	Stability
+•	Innovation
+•	Helping others
+•	Income
+•	Research
+•	Creativity
+•	Teamwork
+•	Autonomy
+Preferences
+•	Work environment
+•	Study environment
+•	International vs local
+•	Theory vs practical
+IMPORTANT:
+Final survey must ALSO read previous collected data:
+•	Initial survey
+•	Diagnostic results
+•	Study behavior
+•	Mood trends
+______________
+6. Career Matching Engine
+After final survey:
+Generate:
+•	3–4 career paths.
+Each card shows:
+•	Career title
+•	Why it fits (based on combined data)
+•	Required skills
+•	Suggested next steps
+______________
+7. University Matching
+Route:
+/universities
+Use mock dataset (12 universities/programs with tags).
+Match based on:
+•	personality
+•	values
+•	interests
+•	learning style
+Display:
+•	Top matches
+•	“Why this matches you”
+______________
+8. Alumni Human Touch
+Route:
+/alumni
+Mock alumni dataset:
+•	Name
+•	Career
+•	University
+•	Tags
+•	Availability
+Student can:
+•	Request meeting
+•	Select time
+•	Send message
+Save to localStorage.
+______________
+Routes Summary
+/
+/onboarding   (INITIAL SURVEY)
+/diagnostic
+/dashboard
+/mood
+/final-survey   (SECOND SURVEY)
+/career
+/universities
+/alumni
+/meetings
+______________
+Required Components
+•	Sidebar
+•	Navbar
+•	StepProgress
+•	Card
+•	Button
+•	QuizQuestion
+•	StudyPlanCard
+•	CareerCard
+•	UniversityCard
+•	AlumniCard
+•	Modal
+•	Toast
+______________
+Data Storage (localStorage)
+Use one object:
+edubridge_state = {
+  userProfile,
+  initialSurvey,
+  diagnosticResults,
+  studyPlan,
+  moodEntries,
+  finalSurvey,
+  careerMatches,
+  universityMatches,
+  meetingRequests
+}
+______________
+Quality Requirements
+•	Clean UX
+•	Responsive layout
+•	Consistent palette usage
+•	End-to-end working flow
+•	Include "Reset Demo Data" button
+______________
