@@ -1,18 +1,73 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Dummy table to satisfy backend infrastructure (unused by frontend)
+export const app_state = pgTable("app_state", {
+  id: serial("id").primaryKey(),
+  data: jsonb("data").notNull(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+// === LOCAL STORAGE STATE SCHEMAS ===
+
+export const userProfileSchema = z.object({
+  name: z.string(),
+  age: z.string(),
+  location: z.string(),
+  school: z.string(),
+  languages: z.string(),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export const initialSurveySchema = z.object({
+  favoriteSubjects: z.string(),
+  weakSubjects: z.string(),
+  interests: z.string(),
+  learningStyle: z.enum(["Visual", "Audio", "Reading", "Kinesthetic"]),
+  studyMethod: z.enum(["Active recall", "Spaced repetition", "Practice problems", "Concept explanation", "Flashcards"]),
+  academicGoals: z.string(),
+  personalGoals: z.string(),
+});
+
+export const moodEntrySchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  rating: z.number().min(1).max(5),
+  note: z.string().optional(),
+});
+
+export const finalSurveySchema = z.object({
+  personality: z.record(z.string(), z.string()), // e.g., "Analytical": "Agree"
+  values: z.array(z.string()),
+  preferences: z.object({
+    workEnvironment: z.string(),
+    studyEnvironment: z.string(),
+    location: z.string(),
+    approach: z.string(),
+  }),
+});
+
+export const studyPlanSchema = z.object({
+  weeklyGoals: z.array(z.string()),
+  recommendedMethod: z.string(),
+  practiceBlocks: z.array(z.object({
+    subject: z.string(),
+    duration: z.string(),
+    task: z.string()
+  }))
+});
+
+// Unified State Object
+export const eduBridgeStateSchema = z.object({
+  userProfile: userProfileSchema.optional(),
+  initialSurvey: initialSurveySchema.optional(),
+  diagnosticResults: z.any().optional(),
+  studyPlan: studyPlanSchema.optional(),
+  moodEntries: z.array(moodEntrySchema).default([]),
+  finalSurvey: finalSurveySchema.optional(),
+  // Mock data results would be stored here
+  careerMatches: z.array(z.any()).default([]),
+  universityMatches: z.array(z.any()).default([]),
+  meetingRequests: z.array(z.any()).default([]),
+});
+
+export type EduBridgeState = z.infer<typeof eduBridgeStateSchema>;
